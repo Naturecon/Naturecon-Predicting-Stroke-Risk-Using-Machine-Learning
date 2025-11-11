@@ -108,3 +108,43 @@ World Health Organization. (2023). The top 10 causes of death.
 Maintained by Team 09 – MSAAI590 IN1 Program, University of San Diego (2025) 
 # For academic and research purposes only.
 
+
+# Setup Instructions:
+
+To replicate the analysis and run the notebooks in this repository, please follow these steps:
+
+#Clone the Repository
+
+git clone https://github.com/Naturecon/Predicting-Stroke-Risk-Using-Machine-Learning.git
+cd Predicting-Stroke-Risk-Using-Machine-Learning
+
+# Create a Virtual Environment:
+
+python -m venv venv
+
+venv\Scripts\activate          # For Windows
+
+# Install Dependencies:
+
+Install all necessary Python packages using the provided requirements.txt file:
+pip install -r requirements.txt
+
+#  Launch Jupyter Notebook:
+
+Start Jupyter Notebook and open any of the project notebooks:
+jupyter notebook
+Navigate to:
+
+notebooks/01_data_cleaning.ipynb
+
+notebooks/02_exploratory_analysis.ipynb
+
+notebooks/03_model_training.ipynb
+
+# Explore and Reproduce Results
+
+View all generated figures in the figures/ directory.
+
+Review the report PDF in reports/Assignment 3.1_Data_Summary_Draft.pdf.
+
+Note: This project uses Python 3.10+ and was tested in Jupyter Notebook. Ensure all dependencies are installed before execution.
