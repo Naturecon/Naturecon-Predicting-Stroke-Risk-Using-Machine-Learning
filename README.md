@@ -148,3 +148,20 @@ View all generated figures in the figures/ directory.
 Review the report PDF in reports/Assignment 3.1_Data_Summary_Draft.pdf.
 
 Note: This project uses Python 3.10+ and was tested in Jupyter Notebook. Ensure all dependencies are installed before execution.
+
+# Project Contributors
+
+This project was collaboratively developed as part of the AAI 590 IN1 Program, University of San Diego (2025).
+
+| Name | Role | Contribution |
+|------|------|---------------|
+| Balubhai Sukani | Team Lead / Data Scientist | Project coordination, data cleaning, exploratory data analysis, and report documentation |
+| Paritosh Umesan | Machine Learning Engineer | Feature engineering, model development, tuning, and evaluation |
+
+# Both team members actively contributed to the design, implementation, and documentation of the data preprocessing, exploratory analysis,
+and predictive modeling workflow.
+
+# Repository Maintained By:
+Team 09 – AAI 590 IN1 Program, University of San Diego (2025) 
+# For academic and research purposes only.
+
