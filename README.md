@@ -100,11 +100,11 @@ Predicting-Stroke-Risk-Using-Machine-Learning/
 └── requirements.txt
 
 References
-Fedesoriano. (2021). *Healthcare Stroke Prediction Dataset. Kaggle.  
+Fedesoriano. (2021). Healthcare Stroke Prediction Dataset. Kaggle.  
 [https://www.kaggle.com/datasets/fedesoriano/stroke-prediction-dataset](https://www.kaggle.com/datasets/fedesoriano/stroke-prediction-dataset)
 World Health Organization. (2023). The top 10 causes of death. 
 [https://www.who.int/news-room/fact-sheets/detail/the-top-10-causes-of-death](https://www.who.int/news-room/fact-sheets/detail/the-top-10-causes-of-death)
 
-Maintained by Team 09 – MSDS Program, University of San Diego (2025) 
+Maintained by Team 09 – MSAAI590 IN1 Program, University of San Diego (2025) 
 # For academic and research purposes only.
 
