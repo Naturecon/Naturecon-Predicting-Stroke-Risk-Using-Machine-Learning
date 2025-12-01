@@ -1,0 +1,115 @@
+# Predicting Stroke Risk Using Machine Learning
+
+This repository contains the full implementation of the project “Predicting Stroke Risk Using Machine Learning on Clinical and Lifestyle Data”,
+developed for the MS Applied Artificial Intelligence Program (AAI 590 IN1), University of San Diego, 2025.
+
+The project applies modern data science and machine learning techniques to predict stroke risk using clinical and lifestyle indicators such as
+age, hypertension, glucose levels, BMI, smoking habits, and more.
+
+Project Objectives
+
+- Preprocess clinical and lifestyle data for predictive modeling  
+- Analyze stroke risk factors using exploratory data analysis (EDA)  
+- Build and compare machine learning models  
+- Develop a neural network architecture (Assignment 5.1)  
+- Evaluate models using accuracy, precision, recall, F1-score, and AUC-ROC  
+- Produce interpretable insights for clinical decision support  
+
+-Dataset
+
+Source: Kaggle — Healthcare Stroke Prediction Dataset (Fedesoriano, 2021)  
+Records: 5,110 patients  
+Features: 12 demographic, clinical, and lifestyle attributes  
+Target: `stroke` (0 = no stroke, 1 = stroke)
+
+Repository Structure
+
+Core Technologies Used
+
+- Python 3.10  
+- Scikit-learn  
+- TensorFlow/Keras  
+- Pandas, NumPy  
+- Matplotlib, Seaborn  
+- Jupyter Notebook  
+
+- Assignment 5.1 — Experimental Methods (Neural Network)  
+  
+Project Contributors
+
+| Name              | Role                         | Contribution |
+|-------------------|-------------------------------|--------------|
+| Balubhai Sukani | Team Lead / Data Scientist     | Data cleaning, preprocessing, analysis, documentation |
+| Paritosh Umesan| Machine Learning Engineer      | Feature engineering, model development, optimization |
+
+License  
+For academic and research use only.
+
+Assignment 5.1 — Experimental Methods: Stroke Risk Prediction
+
+This directory contains all materials for Assignment 5.1: Experimental Methods, which implements a neural network
+model to predict stroke risk using clinical and lifestyle variables.
+ Folder Structure
+
+ Contents
+
+`code`  
+Contains the script:
+
+ `stroke_prediction_assignment5_1.py` — complete experimental methods implementation.
+
+`notebook`  
+Contains:
+
+- `Assignment5_1_StrokeRisk.ipynb` — cleaned and structured notebook version.
+ `data`  
+Place the dataset here:
+
+ `healthcare-dataset-stroke-data[1].csv`
+ # Assignment 5.1 — Code Folder
+
+This folder contains the Python script implementation of all experimental methods for predicting stroke risk using a neural network.
+
+ File Included
+
+`stroke_prediction_assignment5_1.py`
+This script performs:
+
+- Data loading and preprocessing  
+- Class imbalance calculation  
+- One-Hot Encoding + Standard Scaling  
+- Train/validation/test splitting  
+- Neural network model creation (Keras Sequential)  
+- Training with early stopping  
+- Evaluation metrics  
+- Training visualization plots  
+- Model diagram export (`Figure1_Model_Architecture.png`)
+
+How to Run the Script
+
+Open a terminal inside the project root:
+figures 
+Generated output images:
+ `Figure1_Model_Architecture.png`  
+- `training_plots.png`
+
+- Scope of Assignment 5.1
+
+This assignment covers:
+
+- Data preprocessing (scaling, encoding, missing values)  
+- Class imbalance calculation  
+- Train/val/test split design  
+- Neural network architecture setup  
+- Early stopping optimization  
+- Evaluation metrics  
+- Visual training evidence (loss/accuracy curves)
+
+ Output Files Generated
+
+The script saves the following automatically in:
+
+`assignment5.1/figures/`
+
+- `Figure1_Model_Architecture.png`
+- `training_plots.png`
