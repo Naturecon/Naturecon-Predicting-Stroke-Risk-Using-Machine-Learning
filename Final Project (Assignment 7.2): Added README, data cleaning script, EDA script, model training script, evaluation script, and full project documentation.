@@ -1,0 +1,418 @@
+# Predicting Stroke Risk Using Machine Learning
+
+Team: Naturecon (Team 09 — MSAAI590 IN1 Program, University of San Diego)  
+Repo: Predicting-Stroke-Risk-Using-Machine-Learning  
+Maintained by: Balubhai Sukani, Paritosh Umesan
+
+# Project summary :
+
+This project predicts stroke risk from clinical and lifestyle data (Kaggle: Healthcare Stroke Prediction Dataset).
+We perform full data science workflow: data cleaning, EDA, feature engineering, model building, hyperparameter tuning, 
+and model analysis. Models used include Logistic Regression, Random Forest, and XGBoost. Class imbalance is handled with SMOTE.
+
+# Repository structure
+
+Predicting-Stroke-Risk-Using-Machine-Learning/
+├─ data/
+│ ├─ healthcare-dataset-stroke-data.csv # raw dataset (Kaggle)
+│ └─ processed_data.csv # cleaned dataset (generated)
+├─ notebooks/
+│ ├─ 01_data_cleaning.ipynb
+│ ├─ 02_eda.ipynb
+│ ├─ 03_feature_engineering.ipynb
+│ ├─ 04_model_training.ipynb
+│ └─ 05_model_evaluation.ipynb
+├─ scripts/
+│ ├─ data_cleaning.py
+│ ├─ eda_plots.py
+│ ├─ train_model.py
+│ └─ evaluate_model.py
+├─ figures/
+│ ├─ Figure1_Age_Distribution.png
+│ ├─ Figure2_Categorical_Variables.png
+│ └─ Figure3_Correlation_Heatmap.png
+├─ docs/
+│ └─ notebooks_pdf/
+├─ reports/
+│ └─ Final_Team_Project_Report.pdf
+├─ requirements.txt
+└─ README.md
+
+
+# Mapping of required Assignment 7.2 components
+| Requirement | File(s) |
+
+| Data cleaning | `notebooks/01_data_cleaning.ipynb`, `scripts/data_cleaning.py` |
+| EDA | `notebooks/02_eda.ipynb`, `scripts/eda_plots.py`, `figures/` |
+| Feature engineering | `notebooks/03_feature_engineering.ipynb` |
+| Model building And training | `notebooks/04_model_training.ipynb`, `scripts/train_model.py` |
+| Model optimization And analysis | `notebooks/05_model_evaluation.ipynb`, `scripts/evaluate_model.py` |
+| Notebook PDFs for submission | `docs/notebooks_pdf/` |
+| Final report | `reports/Final_Team_Project_Report.pdf` |
+
+# How to reproduce results (quick)
+1. Clone repo:
+
+git clone https://github.com/Naturecon/Predicting-Stroke-Risk-Using-Machine-Learning.git
+cd Predicting-Stroke-Risk-Using-Machine-Learning
+
+Create and activate venv:
+
+python -m venv venv
+# Windows
+venv\Scripts\activate
+
+Install dependencies:
+
+pip install -r requirements.txt
+
+Run data cleaning:
+
+python scripts/data_cleaning.py --input data/healthcare-dataset-stroke-data.csv --output data/processed_data.csv
+
+Generating figures:
+
+python scripts/eda_plots.py --input data/processed_data.csv --outdir figures/
+
+Training models:
+
+python scripts/train_model.py --input data/processed_data.csv --outdir outputs/models/
+
+Evaluate:
+
+evaluate_model.py --input data/processed_data.csv --models outputs/models/
+
+Notes on grading rubric
+
+Each notebook starts with a header describing which requirement it satisfies (Data cleaning, EDA, Model building, Training, Optimization, Analysis).
+
+Notebooks are runnable top-to-bottom.
+
+Comments and markdown explain data choices, imputation, model selection, hyperparameter tuning and evaluation metrics (accuracy, precision, recall, F1, ROC-AUC).
+
+References:
+
+Fedesoriano (2021). Healthcare Stroke Prediction Dataset (Kaggle).
+
+World Health Organization (2023). The top 10 causes of death.
+
+Contact
+
+Team lead: Balubhai Sukani — krna579@gmail.com
+
+# scripts/data_cleaning.py  
+Create `scripts/data_cleaning.py` and paste the code below. This script loads raw CSV, cleans features, imputes BMI, encodes basic types, and saves processed CSV.
+
+data_cleaning.py
+Usage:
+ data_cleaning.py --input data/healthcare-dataset-stroke-data.csv --output data/processed_data.csv
+
+import argparse
+import pandas as pd
+import numpy as np
+
+def load_data(path):
+    return pd.read_csv(path)
+
+def clean_data(df):
+    # Drop id column if present
+    if 'id' in df.columns:
+        df = df.drop(columns=['id'])
+    # Fill BMI missing values with median
+    if 'bmi' in df.columns:
+        df['bmi'] = df['bmi'].fillna(df['bmi'].median())
+    # Trim whitespace in categorical strings (if any)
+    str_cols = df.select_dtypes(include=['object']).columns
+    for c in str_cols:
+        df[c] = df[c].astype(str).str.strip()
+    # Fix categorical typos (example: Govt_jov -> Govt_job)
+    if 'work_type' in df.columns:
+        df['work_type'] = df['work_type'].replace({'Govt_jov':'Govt_job'})
+    return df
+
+def save_data(df, out_path):
+    df.to_csv(out_path, index=False)
+    print(f"Saved cleaned data to {out_path}")
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--input', required=True)
+    parser.add_argument('--output', required=True)
+    args = parser.parse_args()
+
+    df = load_data(args.input)
+    print("Initial shape:", df.shape)
+    df_clean = clean_data(df)
+    print("Cleaned shape:", df_clean.shape)
+    save_data(df_clean, args.output)
+
+if __name__ == "__main__":
+    main()
+
+eda_plots.py
+
+Create scripts/eda_plots.py. It creates and saves EDA figures used in the report.
+
+eda_plots.py
+Usage:
+ python scripts/eda_plots.py --input data/processed_data.csv --outdir figures/
+
+import argparse
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+import os
+
+sns.set(style="whitegrid")
+
+def load_data(path):
+    return pd.read_csv(path)
+
+def age_distribution(df, outdir):
+    plt.figure(figsize=(8,5))
+    sns.histplot(data=df, x="age", hue="stroke", multiple="stack", bins=30)
+    plt.title("Age Distribution by Stroke Occurrence")
+    plt.xlabel("Age")
+    plt.ylabel("Count")
+    plt.legend(title="Stroke", labels=["No", "Yes"])
+    f = os.path.join(outdir, "Figure1_Age_Distribution.png")
+    plt.savefig(f, dpi=300, bbox_inches='tight')
+    plt.close()
+    print("Saved", f)
+
+def glucose_bmi_kde(df, outdir):
+    plt.figure(figsize=(8,5))
+    sns.kdeplot(data=df, x="avg_glucose_level", hue="stroke", fill=True)
+    plt.title("Average Glucose Level by Stroke Occurrence")
+    plt.xlabel("Average Glucose Level (mg/dL)")
+    f = os.path.join(outdir, "Figure2_Glucose_KDE.png")
+    plt.savefig(f, dpi=300, bbox_inches='tight')
+    plt.close()
+    print("Saved", f)
+
+    plt.figure(figsize=(8,5))
+    sns.kdeplot(data=df, x="bmi", hue="stroke", fill=True)
+    plt.title("BMI Distribution by Stroke Occurrence")
+    plt.xlabel("BMI")
+    f = os.path.join(outdir, "Figure3_BMI_KDE.png")
+    plt.savefig(f, dpi=300, bbox_inches='tight')
+    plt.close()
+    print("Saved", f)
+
+def categorical_counts(df, outdir):
+    cats = ['ever_married','work_type','smoking_status','Residence_type','gender']
+    for c in cats:
+        plt.figure(figsize=(8,5))
+        sns.countplot(data=df, x=c, hue='stroke')
+        plt.title(f"{c.replace('_',' ').title()} vs Stroke")
+        plt.xticks(rotation=30)
+        f = os.path.join(outdir, f"Figure_Categorical_{c}.png")
+        plt.savefig(f, dpi=300, bbox_inches='tight')
+        plt.close()
+        print("Saved", f)
+
+def corr_heatmap(df, outdir):
+    numeric = df.select_dtypes(include=['int64','float64'])
+    plt.figure(figsize=(8,6))
+    corr = numeric.corr()
+    sns.heatmap(corr, annot=True, cmap="coolwarm", fmt=".2f")
+    plt.title("Correlation Heatmap")
+    f = os.path.join(outdir, "Figure_Correlation_Heatmap.png")
+    plt.savefig(f, dpi=300, bbox_inches='tight')
+    plt.close()
+    print("Saved", f)
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--input', required=True)
+    parser.add_argument('--outdir', required=True)
+    args = parser.parse_args()
+
+    os.makedirs(args.outdir, exist_ok=True)
+    df = load_data(args.input)
+
+    age_distribution(df, args.outdir)
+    glucose_bmi_kde(df, args.outdir)
+    categorical_counts(df, args.outdir)
+    corr_heatmap(df, args.outdir)
+
+if __name__ == "__main__":
+    main()
+
+train_model.py
+
+Create scripts/train_model.py. This trains models, handles imbalance with SMOTE, and saves trained models.
+
+train_model.py
+Usage:
+ python scripts/train_model.py --input data/processed_data.csv --outdir outputs/models/
+
+import argparse
+import os
+import joblib
+import pandas as pd
+import numpy as np
+
+from sklearn.model_selection import train_test_split, GridSearchCV
+from sklearn.preprocessing import StandardScaler, OneHotEncoder
+from sklearn.compose import ColumnTransformer
+from sklearn.pipeline import Pipeline
+from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestClassifier
+from xgboost import XGBClassifier
+
+from imblearn.over_sampling import SMOTE
+from imblearn.pipeline import Pipeline as ImbPipeline
+
+def load_data(path):
+    return pd.read_csv(path)
+
+def prepare_features(df):
+    X = df.drop(columns=['stroke'])
+    y = df['stroke']
+    # identify numeric and categorical
+    numeric_cols = X.select_dtypes(include=['int64','float64']).columns.tolist()
+    cat_cols = X.select_dtypes(include=['object']).columns.tolist()
+    # if some categorical encoded as numbers, keep only known columns
+    # Return columns to use later
+    return X, y, numeric_cols, cat_cols
+
+def build_models():
+    models = {
+        'logistic': LogisticRegression(max_iter=1000),
+        'rf': RandomForestClassifier(n_estimators=200, random_state=42),
+        'xgb': XGBClassifier(use_label_encoder=False, eval_metric='logloss', random_state=42)
+    }
+    return models
+
+def train_and_save(X, y, outdir):
+    os.makedirs(outdir, exist_ok=True)
+
+    # For simplicity, label-encode any object columns here
+    X_enc = X.copy()
+    for c in X_enc.select_dtypes(include=['object']).columns:
+        X_enc[c] = X_enc[c].astype('category').cat.codes
+
+    X_train, X_test, y_train, y_test = train_test_split(X_enc, y, test_size=0.2, random_state=42, stratify=y)
+
+    # scale numeric features
+    scaler = StandardScaler()
+    X_train_scaled = scaler.fit_transform(X_train)
+    X_test_scaled = scaler.transform(X_test)
+
+    # SMOTE for balancing
+    sm = SMOTE(random_state=42)
+    X_train_bal, y_train_bal = sm.fit_resample(X_train_scaled, y_train)
+
+    models = build_models()
+    for name, model in models.items():
+        print(f"Training {name} ...")
+        model.fit(X_train_bal, y_train_bal)
+        # Save model and scaler
+        joblib.dump(model, os.path.join(outdir, f"{name}_model.joblib"))
+        joblib.dump(scaler, os.path.join(outdir, f"{name}_scaler.joblib"))
+        print(f"Saved {name} model and scaler to {outdir}")
+
+    # Save test split for evaluation
+    pd.DataFrame(X_test, columns=X_train.columns).to_csv(os.path.join(outdir, "X_test.csv"), index=False)
+    pd.Series(y_test, name='stroke').to_csv(os.path.join(outdir, "y_test.csv"), index=False)
+    print("Saved test split to", outdir)
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--input', required=True)
+    parser.add_argument('--outdir', required=True)
+    args = parser.parse_args()
+    df = load_data(args.input)
+    X, y, _, _ = prepare_features(df)
+    train_and_save(X, y, args.outdir)
+
+if __name__ == "__main__":
+    main()
+
+evaluate_model.py
+
+Create scripts/evaluate_model.py. This loads saved models and outputs evaluation metrics & plots.
+
+evaluate_model.py
+
+Usage:
+ python scripts/evaluate_model.py --input data/processed_data.csv --models outputs/models/ --outdir outputs/eval/
+
+import argparse
+import os
+import joblib
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+from sklearn.metrics import (accuracy_score, precision_score, recall_score, f1_score,
+                             roc_auc_score, confusion_matrix, classification_report)
+
+sns.set(style="whitegrid")
+
+def load_saved_test(models_dir):
+    X_test = pd.read_csv(os.path.join(models_dir, "X_test.csv"))
+    y_test = pd.read_csv(os.path.join(models_dir, "y_test.csv"))['stroke']
+    return X_test, y_test
+
+def evaluate_model(model, scaler, X_test, y_test):
+    X_test_scaled = scaler.transform(X_test)
+    y_pred = model.predict(X_test_scaled)
+    y_proba = model.predict_proba(X_test_scaled)[:,1] if hasattr(model, "predict_proba") else None
+
+    metrics = {
+        'accuracy': accuracy_score(y_test, y_pred),
+        'precision': precision_score(y_test, y_pred, zero_division=0),
+        'recall': recall_score(y_test, y_pred, zero_division=0),
+        'f1': f1_score(y_test, y_pred, zero_division=0),
+        'roc_auc': roc_auc_score(y_test, y_proba) if y_proba is not None else None
+    }
+    return y_pred, y_proba, metrics
+
+def plot_confusion(y_test, y_pred, outpath):
+    cm = confusion_matrix(y_test, y_pred)
+    plt.figure(figsize=(5,4))
+    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues')
+    plt.title("Confusion Matrix")
+    plt.xlabel("Predicted")
+    plt.ylabel("Actual")
+    plt.savefig(outpath, dpi=300, bbox_inches='tight')
+    plt.close()
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--input', required=True)
+    parser.add_argument('--models', required=True)
+    parser.add_argument('--outdir', required=True)
+    args = parser.parse_args()
+
+    os.makedirs(args.outdir, exist_ok=True)
+    X_test, y_test = load_saved_test(args.models)
+
+    results = {}
+    for fname in os.listdir(args.models):
+        if fname.endswith("_model.joblib"):
+            name = fname.split("_model.joblib")[0]
+            model = joblib.load(os.path.join(args.models, fname))
+            scaler = joblib.load(os.path.join(args.models, f"{name}_scaler.joblib"))
+            y_pred, y_proba, metrics = evaluate_model(model, scaler, X_test, y_test)
+            results[name] = metrics
+
+            # Save classification report
+            cr = classification_report(y_test, y_pred, zero_division=0)
+            with open(os.path.join(args.outdir, f"{name}_classification_report.txt"), 'w') as f:
+                f.write(cr)
+
+            # Save confusion matrix
+            plot_confusion(y_test, y_pred, os.path.join(args.outdir, f"{name}_confusion.png"))
+
+    # Write summary CSV
+    summary = pd.DataFrame(results).T
+    summary.to_csv(os.path.join(args.outdir, "evaluation_summary.csv"))
+    print("Evaluation summary saved to", args.outdir)
+
+if __name__ == "__main__":
+    main()
+
